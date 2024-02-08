@@ -1,16 +1,13 @@
 // See LICENSE.SiFive for license details.
 
-package freechips.rocketchip.aop
+package org.chipsalliance.diplomacy.aop
 
 import chisel3.Data
-import org.chipsalliance.cde.config.Parameters
-import freechips.rocketchip.diplomacy.{
+import org.chipsalliance.diplomacy.lazymodule.LazyModule
+import org.chipsalliance.diplomacy.nodes.{
   AnyMixedNode,
   BaseNode,
-  InwardNode,
-  LazyModule,
   MixedNode,
-  OutwardNode,
 }
 
 /** Combinators for finding specific sets of [[LazyModule]]s/[[Node]]s.
@@ -19,24 +16,6 @@ import freechips.rocketchip.diplomacy.{
   * placing monitors or annotating metadata.
   */
 object Select {
-
-  /** Contains information about an inward edge of a node
-    */
-  case class InwardEdge[Bundle <: Data, EdgeInParams](
-    params: Parameters,
-    bundle: Bundle,
-    edge: EdgeInParams,
-    node: OutwardNode[_, _, Bundle],
-  )
-
-  /** Contains information about an outward edge of a node
-    */
-  case class OutwardEdge[Bundle <: Data, EdgeOutParams](
-    params: Parameters,
-    bundle: Bundle,
-    edge: EdgeOutParams,
-    node: InwardNode[_, _, Bundle],
-  )
 
   /** Collects the [[InwardEdge]]s of a node. Defined as a separate method so
     * that the bundle/edge types can be set properly
@@ -48,8 +27,7 @@ object Select {
     }
   }
 
-  /** Applies the collect function to each [[InwardEdge]] of a node
-    */
+  /** Applies the collect function to each [[InwardEdge]] of a node */
   def collectInwardEdges[T](node: BaseNode)(collect: PartialFunction[InwardEdge[_ <: Data, _], T]): Iterable[T] = {
     node match {
       case node: AnyMixedNode => getInwardEdges(node).collect(collect)
@@ -67,8 +45,7 @@ object Select {
     }
   }
 
-  /** Applies the collect function to each [[OutardEdge]] of a node
-    */
+  /** Applies the collect function to each [[OutardEdge]] of a node */
   def collectOutwardEdges[T](node: BaseNode)(collect: PartialFunction[OutwardEdge[_ <: Data, _], T]): Iterable[T] = {
     node match {
       case node: AnyMixedNode => getOutwardEdges(node).collect(collect)
